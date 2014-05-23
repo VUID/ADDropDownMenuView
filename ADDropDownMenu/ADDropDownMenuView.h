@@ -33,5 +33,7 @@
 - (instancetype)initAtOrigin:(CGPoint)origin withItemsViews:(NSArray *)itemsViews;
 
 - (void)setSelectedAtIndex:(NSInteger)index;
+- (void)expand;
+- (void)contract;
 
 @end

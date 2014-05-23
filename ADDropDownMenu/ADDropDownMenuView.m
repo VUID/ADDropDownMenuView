@@ -238,6 +238,9 @@
 }
 
 - (void)expand{
+	
+	// Don't run the method if it's already open.
+	if (self.isOpen) return;
     
     self.isAnimating = YES;
     CGRect expandedFrame = (CGRect){.origin = self.containerView.frame.origin,
@@ -260,6 +263,9 @@
 
 - (void)contract{
     
+	// Don't run the method if it's already closed
+	if (!self.isOpen) return;
+	
     self.isAnimating = YES;
     CGRect contractedFrame = (CGRect){.origin = self.containerView.frame.origin,
         .size = CGSizeMake(self.containerView.frame.size.width, [ADDropDownMenuView contractedHeightForItemsViews: self.itemsViews])};
