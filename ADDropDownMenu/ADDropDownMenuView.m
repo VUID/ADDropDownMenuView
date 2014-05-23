@@ -32,24 +32,32 @@
 - (instancetype)initAtOrigin:(CGPoint)origin withItemsViews:(NSArray *)itemsViews{
     
     NSAssert(itemsViews.count > 0, @"ADDropDownMenuView should has at least one item view");
-    
-    if(self = [super initWithFrame: (CGRect){.origin = origin,
+	
+	CGRect frame = {
+		.origin = origin,
 		.size = CGSizeMake(((ADDropDownMenuItemView *)[itemsViews firstObject]).frame.size.width,
-						   [ADDropDownMenuView contractedHeightForItemsViews:itemsViews])}]){
-			self.backgroundColor = [UIColor clearColor];
-			self.itemsViews = [itemsViews mutableCopy];
-			self.separators = [NSMutableArray array];
-			self.menuAnimationDuration = 0.3f;
-			self.disableDimView = NO;
-			
-			[self addDimView];
-			[self addContainerView];
-			[self addItemsViewsAndSeparators];
-			[self selectItem: [self.itemsViews firstObject]];
-			self.initialItems = [NSArray arrayWithArray:itemsViews];
-		}
+						   [ADDropDownMenuView contractedHeightForItemsViews:itemsViews])
+	};
+    
+    if(self = [super initWithFrame: frame]){
+			[self setup:itemsViews];
+	}
     
     return self;
+}
+
+- (void)setup:(NSArray *)itemsViews {
+	self.backgroundColor = [UIColor clearColor];
+	self.itemsViews = [itemsViews mutableCopy];
+	self.separators = [NSMutableArray array];
+	self.menuAnimationDuration = 0.3f;
+	self.disableDimView = NO;
+	
+	[self addDimView];
+	[self addContainerView];
+	[self addItemsViewsAndSeparators];
+	[self selectItem: [self.itemsViews firstObject]];
+	self.initialItems = [NSArray arrayWithArray:itemsViews];
 }
 
 #pragma mark - Properties
