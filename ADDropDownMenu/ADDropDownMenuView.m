@@ -31,7 +31,7 @@
 
 - (instancetype)initAtOrigin:(CGPoint)origin withItemsViews:(NSArray *)itemsViews{
     
-    NSAssert(itemsViews.count > 0, @"ADDropDownMenuView should has at least one item view");
+    NSAssert(itemsViews.count > 0, @"ADDropDownMenuView should have atleast one item view");
 	
 	CGRect frame = {
 		.origin = origin,
@@ -40,7 +40,7 @@
 	};
     
     if(self = [super initWithFrame: frame]){
-			[self setup:itemsViews];
+		[self setup:itemsViews];
 	}
     
     return self;
