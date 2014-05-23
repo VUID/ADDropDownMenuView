@@ -90,8 +90,6 @@
     [self addSubview: self.titleLabel];
 }
 
-//161 163 163
-
 #pragma mark - Interface
 
 - (void)setBackgroundColor:(UIColor *)backgroundColor forState:(ADDropDownMenuItemViewState)state{
@@ -106,33 +104,49 @@
 }
 
 - (void)setBackgroundImage:(UIImage *)image forState:(ADDropDownMenuItemViewState)state{
-    
-    NSParameterAssert(image);
-    self.statesBackgroundImages[@(state)] = image;
-    [self updateUIForCurrentState];
+	[self setBackgroundImage:image forState:state withInsets:UIEdgeInsetsZero];
 }
+
+- (void)setBackgroundImage:(UIImage *)image forState:(ADDropDownMenuItemViewState)state withInsets:(UIEdgeInsets)insets {
+	NSParameterAssert(image);
+    self.statesBackgroundImages[@(state)] = image;
+	
+	CGRect frame = self.frame;
+
+	frame.origin.x += insets.left;
+	frame.origin.y += insets.top;
+	frame.size.width -= (insets.left + insets.right);
+	frame.size.height -= (insets.top + insets.bottom);
+	
+	[self.backgroundImageView setFrame:frame];
+	[self updateUIForCurrentState];
+}
+
 
 - (UIImage *)backgroundImageForState:(ADDropDownMenuItemViewState)state{
     return self.statesBackgroundImages[@(state)];
+}
+
+- (void)setTitleText:(NSString *)text forFont :(UIFont *)font {
+	[self.titleLabel setText:text];
+	[self.titleLabel setFont:font];
+	[self.titleLabel resizeToFit];
 }
 
 - (void)setTitleColor:(UIColor *)color forState:(ADDropDownMenuItemViewState)state{
     
     NSParameterAssert(color);
     self.statesTitleColor[@(state)] = color;
+	[self updateUIForCurrentState];
 }
 
 - (UIColor *)titleColorForState:(ADDropDownMenuItemViewState)state{
     return self.statesTitleColor[@(state)];
 }
 
-/*
-// Only override drawRect: if you perform custom drawing.
-// An empty implementation adversely affects performance during animation.
-- (void)drawRect:(CGRect)rect
-{
-    // Drawing code
+- (void)setTitleOffset:(UIOffset)offset {
+	CGRect frame = CGRectOffset(self.titleLabel.frame, offset.horizontal, offset.vertical);
+	[self.titleLabel setFrame:frame];
 }
-*/
 
 @end

@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "UILabel+frameFitting.h"
 
 typedef NS_ENUM(NSInteger, ADDropDownMenuItemViewState){
     ADDropDownMenuItemViewStateNormal,
@@ -17,7 +18,7 @@ typedef NS_ENUM(NSInteger, ADDropDownMenuItemViewState){
 @interface ADDropDownMenuItemView : UIView
 
 @property (nonatomic, strong, readonly) UILabel *titleLabel;
-@property (nonatomic, strong, readonly) UIImageView *backgroundImageView;;
+@property (nonatomic, strong, readonly) UIImageView *backgroundImageView;
 
 @property (nonatomic, unsafe_unretained) ADDropDownMenuItemViewState state;
 
@@ -30,10 +31,14 @@ typedef NS_ENUM(NSInteger, ADDropDownMenuItemViewState){
 - (UIColor *)backgroundColorForState:(ADDropDownMenuItemViewState)state;
 
 - (void)setBackgroundImage:(UIImage *)image forState:(ADDropDownMenuItemViewState)state;
+- (void)setBackgroundImage:(UIImage *)image forState:(ADDropDownMenuItemViewState)state withInsets:(UIEdgeInsets)insets;
 - (UIImage *)backgroundImageForState:(ADDropDownMenuItemViewState)state;
 
 - (void)setTitleColor:(UIColor *)color forState:(ADDropDownMenuItemViewState)state;
 - (UIColor *)titleColorForState:(ADDropDownMenuItemViewState)state;
+
+- (void)setTitleText:(NSString *)text forFont:(UIFont *)font;
+- (void)setTitleOffset:(UIOffset)offset;
 
 
 @end
