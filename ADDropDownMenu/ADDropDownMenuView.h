@@ -28,6 +28,7 @@
 @property (nonatomic, unsafe_unretained, readonly) BOOL isOpen;
 @property (nonatomic, assign) CGFloat menuAnimationDuration;
 @property (nonatomic) BOOL disableDimView;
+@property (nonatomic) BOOL orderedMenuList;
 
 @property (nonatomic, weak) id<ADDropDownMenuDelegate> delegate;
 

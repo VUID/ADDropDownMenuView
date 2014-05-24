@@ -56,6 +56,7 @@
 	self.borders = [NSMutableArray array];
 	self.menuAnimationDuration = 0.3f;
 	self.disableDimView = NO;
+	self.orderedMenuList = NO;
 	
 	[self addDimView];
 	[self addContainerView];
@@ -185,6 +186,7 @@
         
 		// Setup an item's frame and add it to the container
         item.frame = (CGRect){.origin = CGPointMake(item.frame.origin.x, itemY), .size = item.frame.size};
+		item.tag = idx;
         [self.containerView addSubview: item];
 		
 		// Setup the top border
@@ -251,11 +253,30 @@
 
 - (void)exchangeItem:(ADDropDownMenuItemView *)item withItem:(ADDropDownMenuItemView *)item2{
     
-    CGRect itemRect = item.frame;
-    item.frame = item2.frame;
-    item2.frame = itemRect;
+	CGRect itemRect = item.frame;
+	item.frame = item2.frame;
+	item2.frame = itemRect;
     
-    [self.itemsViews exchangeObjectAtIndex:[self.itemsViews indexOfObject: item] withObjectAtIndex:[self.itemsViews indexOfObject: item2]];
+	[self.itemsViews exchangeObjectAtIndex:[self.itemsViews indexOfObject: item] withObjectAtIndex:[self.itemsViews indexOfObject: item2]];
+	
+	// End the method if the list should not keep the order of non selected items
+	if (!self.orderedMenuList) return;
+	NSUInteger idx = [self.itemsViews indexOfObject:item2];
+	
+	/* topItem: Assigned to the item with a decremented index. If that item is the selected
+	 *			item (index 0 in the itemsViews array) then set it topItem nil
+	 * 
+	 * bottomItem: Assigned to the item with a incremented index. If that index is less than
+	 *			   the last index set the bottomItem else set it nil
+	 */
+	ADDropDownMenuItemView *topItem = (idx>1) ? [self.itemsViews objectAtIndex:idx-1] : nil;
+	ADDropDownMenuItemView *bottomItem = (idx<[self.itemsViews count]-1) ?
+									[self.itemsViews objectAtIndex:idx+1] : nil;
+	
+	// Check to see if the swaped out item should be exchanged with its adjacent menu items
+	// tag on the view is set to the item's original index in the itemsViews array
+	if (bottomItem && bottomItem.tag<item2.tag) [self exchangeItem:bottomItem withItem:item2];
+	else if(topItem && topItem.tag>item2.tag) [self exchangeItem:topItem withItem:item2];
 }
 
 - (void)highlightItem:(ADDropDownMenuItemView *)item{
