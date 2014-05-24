@@ -8,8 +8,10 @@
 
 #import "ADDropDownMenuView.h"
 #import "ADDropDownMenuItemView.h"
+#import <QuartzCore/QuartzCore.h>
 
 #define SEPARATOR_VIEW_HEIGHT 1
+#define BOARDER_VIEW_WIDTH 1
 #define DIM_VIEW_TAG 1919101910
 
 @interface ADDropDownMenuView()
@@ -18,6 +20,7 @@
 @property (nonatomic, strong) UIView *dimView;
 @property (nonatomic, strong, readwrite) NSMutableArray *itemsViews;
 @property (nonatomic, strong) NSMutableArray *separators;
+@property (nonatomic, strong) NSMutableArray *borders;
 
 @property (nonatomic, unsafe_unretained, readwrite) BOOL isOpen;
 @property (nonatomic, unsafe_unretained) BOOL isAnimating;
@@ -50,12 +53,13 @@
 	self.backgroundColor = [UIColor clearColor];
 	self.itemsViews = [itemsViews mutableCopy];
 	self.separators = [NSMutableArray array];
+	self.borders = [NSMutableArray array];
 	self.menuAnimationDuration = 0.3f;
 	self.disableDimView = NO;
 	
 	[self addDimView];
 	[self addContainerView];
-	[self addItemsViewsAndSeparators];
+	[self addItemsViewsAndSeparatorsAndBorders];
 	[self selectItem: [self.itemsViews firstObject]];
 	self.initialItems = [NSArray arrayWithArray:itemsViews];
 }
@@ -68,6 +72,14 @@
     [self.separators enumerateObjectsUsingBlock:^(UIView *separatorView, NSUInteger idx, BOOL *stop) {
         separatorView.backgroundColor = separatorColor;
     }];
+}
+
+- (void)setBorderColor:(UIColor *)borderColor {
+	
+	_borderColor = borderColor;
+	[self.borders enumerateObjectsUsingBlock:^(UIView *borderView, NSUInteger idx, BOOL *stop) {
+		borderView.backgroundColor = borderColor;
+	}];
 }
 
 #pragma mark - Touches
@@ -164,22 +176,60 @@
     [self addSubview: self.containerView];
 }
 
-- (void)addItemsViewsAndSeparators{
+- (void)addItemsViewsAndSeparatorsAndBorders{
     
     NSUInteger itemsCount = self.itemsViews.count;
     __block CGFloat itemY = 0;
     
     [self.itemsViews enumerateObjectsUsingBlock:^(ADDropDownMenuItemView *item, NSUInteger idx, BOOL *stop) {
         
+		// Setup an item's frame and add it to the container
         item.frame = (CGRect){.origin = CGPointMake(item.frame.origin.x, itemY), .size = item.frame.size};
         [self.containerView addSubview: item];
+		
+		// Setup the top border
+		if (idx == 0) {
+			UIView *topBorder = [self separatorView];
+			
+			[self.borders addObject:topBorder];
+			topBorder.frame = (CGRect){.origin = CGPointMake(0, 0), .size = topBorder.frame.size};
+			topBorder.layer.zPosition = MAXFLOAT;
+			[self.containerView addSubview:topBorder];
+		}
         
-        if(idx < itemsCount - 1){
-            UIView *separatorView = [self separatorView];
+		// Setup the vertical borders
+		UIView *leftVerticalBorder = [self borderView];
+		UIView *rightVerticalBorder = [self borderView];
+		leftVerticalBorder.frame = (CGRect){.origin = CGPointMake(0, itemY), .size = leftVerticalBorder.frame.size};
+		rightVerticalBorder.frame = (CGRect){.origin = CGPointMake(item.frame.size.width-1, itemY), .size = rightVerticalBorder.frame.size};
+		leftVerticalBorder.layer.zPosition = MAXFLOAT;
+		rightVerticalBorder.layer.zPosition = MAXFLOAT;
+		
+		[self.containerView addSubview:leftVerticalBorder];
+		[self.containerView addSubview:rightVerticalBorder];
+		
+		[self.borders addObjectsFromArray:@[leftVerticalBorder, rightVerticalBorder]];
+		
+		// Setup the separators
+		if(idx < itemsCount - 1){
+			UIView *separatorView = [self separatorView];
+
+			[self.separators addObject:separatorView];
             separatorView.frame = (CGRect){.origin = CGPointMake(separatorView.frame.origin.x, itemY + item.frame.size.height), .size = separatorView.frame.size};
-            [self.containerView addSubview: separatorView];
-            itemY = separatorView.frame.size.height + separatorView.frame.origin.y;
+			[self.containerView addSubview:separatorView];
+			itemY = separatorView.frame.size.height + separatorView.frame.origin.y;
         }
+		
+		// Setup the bottom border
+		if (idx == [self.itemsViews count]-1) {
+			UIView *bottomBorder = [self separatorView];
+			
+			[self.borders addObject:bottomBorder];
+			bottomBorder.frame = (CGRect){.origin = CGPointMake(0, itemY+item.frame.size.height-1), .size = bottomBorder.frame.size};
+			bottomBorder.layer.zPosition = MAXFLOAT;
+			[self.containerView addSubview:bottomBorder];
+		}
+		
     }];
 }
 
@@ -187,8 +237,14 @@
     
     UIView *separatorView = [[UIView alloc] initWithFrame: (CGRect){.size = CGSizeMake(self.bounds.size.width, SEPARATOR_VIEW_HEIGHT)}];
     separatorView.backgroundColor = self.separatorColor;
-    [self.separators addObject: separatorView];
     return separatorView;
+}
+
+- (UIView *)borderView{
+	
+	UIView *borderView = [[UIView alloc] initWithFrame: (CGRect){.size = CGSizeMake(BOARDER_VIEW_WIDTH, self.bounds.size.height+1)}];
+	borderView.backgroundColor = self.borderColor;
+	return borderView;
 }
 
 #pragma mark - Helpers

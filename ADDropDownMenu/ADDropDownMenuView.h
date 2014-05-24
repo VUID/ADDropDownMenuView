@@ -24,6 +24,7 @@
 
 @property (nonatomic, strong, readonly) NSMutableArray *itemsViews;
 @property (nonatomic, strong) UIColor *separatorColor;
+@property (nonatomic, strong) UIColor *borderColor;
 @property (nonatomic, unsafe_unretained, readonly) BOOL isOpen;
 @property (nonatomic, assign) CGFloat menuAnimationDuration;
 @property (nonatomic) BOOL disableDimView;
