@@ -314,6 +314,10 @@
     return itemsCount * someItem.frame.size.height + SEPARATOR_VIEW_HEIGHT * MAX(itemsCount - 1, 0);
 }
 
++ (CGFloat)expandedHeightForItemsViews:(NSArray *)itemsViews withRange:(NSRange)range {
+	
+}
+
 - (void)expand{
 	
 	// Don't run the method if it's already open.
@@ -362,15 +366,6 @@
     self.isOpen = NO;
 }
 
-/*
-// Only override drawRect: if you perform custom drawing.
-// An empty implementation adversely affects performance during animation.
-- (void)drawRect:(CGRect)rect
-{
-    // Drawing code
-}
-*/
-
 - (void)setSelectedAtIndex:(NSInteger)index {
     ADDropDownMenuItemView *itemView = self.initialItems[index];
 	self.shouldContractOnTouchesEnd = NO;
@@ -380,6 +375,29 @@
 		[self.delegate ADDropDownMenu:self didSelectItem:itemView];
 	}
 	[self contract];
+}
+
+- (void)offsetBorderStart:(NSUInteger)offset {
+	NSAssert(offset<[self.itemsViews count]-1, @"Border offset cannot be greater than or equal to the number of items");
+	
+	NSUInteger length = 3 + 2 * (offset-1);
+	NSIndexSet *idxSet = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, length)];
+	[[self.borders objectsAtIndexes:idxSet] enumerateObjectsUsingBlock:^(UIView *border, NSUInteger idx, BOOL *stop) {
+		[border removeFromSuperview];
+	}];
+	[self.borders removeObjectsAtIndexes:idxSet];
+	
+	// Setup the new top border
+	UIView *topBorder = [self separatorView];
+	[self.borders addObject:topBorder];
+	
+	ADDropDownMenuView *someItem = [self.itemsViews firstObject];
+	CGFloat borderTopY = offset * someItem.frame.size.height + SEPARATOR_VIEW_HEIGHT * MAX(offset - 1, 0);
+	topBorder.frame = (CGRect){.origin = CGPointMake(0, borderTopY), .size = topBorder.frame.size};
+	topBorder.layer.zPosition = MAXFLOAT;
+
+	[self.containerView addSubview:topBorder];
+	
 }
 
 @end
